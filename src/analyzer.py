@@ -17,7 +17,7 @@ class LambdaAnalyzer:
         self.num_invocations = args.num_invocations
 
     def get_results(self) -> object:
-        self.print_lambda_params()
+        self._print_lambda_params()
 
         log_results_lst = []
         for _ in range(self.num_invocations):
@@ -29,9 +29,9 @@ class LambdaAnalyzer:
                 b64decode(response.get("LogResult", "")).decode("utf-8")
             )
 
-        return self.generate_report_from_log_results(log_results_lst)
+        return self._generate_report_from_log_results(log_results_lst)
 
-    def generate_report_from_log_results(self, log_results_lst: list[str]):
+    def _generate_report_from_log_results(self, log_results_lst: list[str]):
         durations = []
         init_durations = []
 
@@ -80,7 +80,7 @@ class LambdaAnalyzer:
             ),
         }
 
-    def print_lambda_params(self):
+    def _print_lambda_params(self):
         print(
             f"Calling Lambda function: `{self.function}` with payload `{self.payload}` for `{self.num_invocations}` times."
         )
