@@ -36,11 +36,13 @@ def calculate_percentile_duration(durations: list[object]):
     p80_index = int(len(durations) * (80 / 100))
     p90_index = int(len(durations) * (90 / 100))
     p95_index = int(len(durations) * (95 / 100))
+    p99_index = int(len(durations) * (99 / 100))
 
     return {
         "p80": convert_result_to_appropiate_unit(total_duration_ms_lst[p80_index]),
         "p90": convert_result_to_appropiate_unit(total_duration_ms_lst[p90_index]),
         "p95": convert_result_to_appropiate_unit(total_duration_ms_lst[p95_index]),
+        "p99": convert_result_to_appropiate_unit(total_duration_ms_lst[p99_index]),
     }
 
 
@@ -63,7 +65,7 @@ def convert_result_to_appropiate_unit(result: float):
     if result >= 1000 and result < 60000:  # ms to s
         return f"{round(result / 1000, 2)} s"
     if result >= 60000:  # ms to m
-        return f"{round(result / 10000, 2)} m"
+        return f"{round(result / 60000, 2)} m"
 
     return f"{round(result, 2)} ms"
 
