@@ -9,5 +9,5 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - run: pip3 install dev-requirements.txt
+      - run: pip3 install -r dev-requirements.txt
       - run: python3 -m pytest tests/unit --cov --cov-report term-missing -vv
