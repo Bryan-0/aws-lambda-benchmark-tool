@@ -13,14 +13,19 @@ def test_ResultReporter_export_json_file(cwd_mock, os_makedirs_mock):
     }
 
     with patch("builtins.open", mock_open()) as open_mock:
-        ResultReporter.export_json_file(aggregated_results, individual_results_dict)
+        ResultReporter.export_json_file(
+            aggregated_results, individual_results_dict, "FunctionName"
+        )
 
     os_makedirs_mock.assert_called_once_with("/my_location/output/json", exist_ok=True)
-    open_mock.assert_called_once_with("/my_location/output/json/report.json", mode="w")
+    open_mock.assert_called_once_with(
+        "/my_location/output/json/report_FunctionName.json", mode="w"
+    )
     open_mock.return_value.write.assert_called_once_with(
         json.dumps(
             {
                 "report": {
+                    "lambda": "FunctionName",
                     "aggregated": aggregated_results,
                     "individual": individual_results_dict,
                 }
@@ -73,7 +78,7 @@ def test_ResultReporter_export_graph_image(plt_mock, cwd_mock, os_makedirs_mock)
     )
     plt_mock.savefig.assert_has_calls(
         [
-            call("/my_location/output/graphs/durations_graph_report.png"),
-            call("/my_location/output/graphs/memory_usages_graph_report.png"),
+            call("/my_location/output/graphs/durations_graph_report_pollo.png"),
+            call("/my_location/output/graphs/memory_usages_graph_report_pollo.png"),
         ]
     )

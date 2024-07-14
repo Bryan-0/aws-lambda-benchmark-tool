@@ -91,3 +91,10 @@ def convert_memory_result_to_appropiate_unit(result: int):
     if result >= 1024:
         return f"{round(result / 1024, 2)} GB"
     return f"{result} MB"
+
+
+def extract_lambda_name(lambda_str: str):
+    if ":" not in lambda_str:
+        return lambda_str
+
+    return lambda_str.split(":")[6]

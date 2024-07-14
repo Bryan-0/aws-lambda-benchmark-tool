@@ -23,6 +23,7 @@ class LambdaAnalyzer:
 
         log_results_lst = []
         for _ in range(self.num_invocations):
+            # TODO: dynamic payload option - user-provided function
             response = self.lambda_client.invoke_lambda(
                 self.function,
                 self.payload,
@@ -34,6 +35,7 @@ class LambdaAnalyzer:
         return self._generate_report_from_log_results(log_results_lst)
 
     def _generate_report_from_log_results(self, log_results_lst: list[str]):
+        # TODO: estimate costs - evalute memory conf + billed duration + ephemeral storage conf (use GetFunctionConfiguration API)
         durations = []
         init_durations = []
         max_memory_usages = []

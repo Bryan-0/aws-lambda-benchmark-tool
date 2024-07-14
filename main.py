@@ -10,6 +10,7 @@ from src.helpers import (
 from src.lambda_client import LambdaClient
 
 import json
+import time
 
 from src.reporter import ResultReporter
 
@@ -91,6 +92,7 @@ if __name__ == "__main__":
     print(
         f"Starting with {args.workers} {'process' if args.workers == 1 else 'processes'}"
     )
+    start_time = time.time()
 
     total_executions = int(args.num_invocations * args.workers)
     process_manager = Manager()
@@ -132,10 +134,13 @@ if __name__ == "__main__":
 
     if args.export_report_json:
         ResultReporter.export_json_file(
-            aggregated_results, dict(individual_results_dict)
+            aggregated_results, dict(individual_results_dict), args.function
         )
 
     if args.export_graph:
         ResultReporter.export_graph_image(
             duration_results_arr, max_memory_usages_arr, args.function
         )
+
+    end_time = time.time()
+    print(f"Time elapsed: {round(end_time - start_time, 2)} s")

@@ -154,3 +154,19 @@ def test_convert_memory_result_to_appropiate_unit_returns_correct_conversion(
     assert (
         helpers.convert_memory_result_to_appropiate_unit(MB_result) == expected_result
     )
+
+
+@pytest.mark.parametrize(
+    "lambda_str, expected_lambda_name",
+    [
+        ("Testing", "Testing"),
+        ("arn:aws:lambda:us-east-1:211125686765:function:Testing", "Testing"),
+        (
+            "arn:aws:lambda:us-east-1:211125686765:function:Testing:live",
+            "Testing",
+        ),
+        ("arn:aws:lambda:us-east-1:211125686765:function:Testing:25", "Testing"),
+    ],
+)
+def test_extract_lambda_name_returns_only_lambda_name(lambda_str, expected_lambda_name):
+    assert helpers.extract_lambda_name(lambda_str) == expected_lambda_name
