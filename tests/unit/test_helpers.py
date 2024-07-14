@@ -126,3 +126,31 @@ def test_get_time_and_unit_duration_returns_expected_split_values(
     duration_str, expected_result
 ):
     assert helpers.get_time_and_unit_duration(duration_str) == expected_result
+
+
+@pytest.mark.parametrize(
+    "memory_str, expected_result",
+    [("35 MB", (35, "MB")), ("1 GB", (1, "GB"))],
+)
+def test_get_memory_value_and_unit_returns_expected_split_values(
+    memory_str, expected_result
+):
+    assert helpers.get_memory_value_and_unit(memory_str) == expected_result
+
+
+@pytest.mark.parametrize(
+    "unit, value, expected", [("MB", 35, 35), ("GB", 2, 2048), ("GB", 1.5, 1536)]
+)
+def test_convert_memory_value_to_MB_returns_correct_conversion(unit, value, expected):
+    assert helpers.convert_memory_value_to_MB(unit, value) == expected
+
+
+@pytest.mark.parametrize(
+    "MB_result, expected_result", [(2724, "2.66 GB"), (500, "500 MB"), (0, "0 MB")]
+)
+def test_convert_memory_result_to_appropiate_unit_returns_correct_conversion(
+    MB_result, expected_result
+):
+    assert (
+        helpers.convert_memory_result_to_appropiate_unit(MB_result) == expected_result
+    )

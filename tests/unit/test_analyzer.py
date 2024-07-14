@@ -52,4 +52,5 @@ def test_LambdaAnalyzer_get_results_returns_report_dict_correctly(print_mock):
         "maxInitDuration": "92.18 ms",
         "durationList": [2.3],
         "initDurationList": [92.18],
+        "maxMemoryUsagesList": [35],
     }

@@ -5,6 +5,8 @@ from src.helpers import (
     calculate_max_min_duration,
     calculate_percentile_duration,
     convert_duration_unit_to_ms,
+    convert_memory_value_to_MB,
+    get_memory_value_and_unit,
     get_time_and_unit_duration,
 )
 
@@ -34,6 +36,7 @@ class LambdaAnalyzer:
     def _generate_report_from_log_results(self, log_results_lst: list[str]):
         durations = []
         init_durations = []
+        max_memory_usages = []
 
         for log_result in log_results_lst:
             for line in log_result.split("\n"):
@@ -54,6 +57,11 @@ class LambdaAnalyzer:
                                 item.split("Duration: ")[-1]
                             )
                             durations.append({"time": time, "unit": unit})
+                        elif "Max Memory Used:" in item:
+                            value, unit = get_memory_value_and_unit(
+                                item.split("Max Memory Used: ")[-1]
+                            )
+                            max_memory_usages.append({"value": value, "unit": unit})
 
         avg_duration = calculate_average_duration(durations)
         percentiles_duration = calculate_percentile_duration(durations)
@@ -76,6 +84,14 @@ class LambdaAnalyzer:
                 map(
                     lambda dur: convert_duration_unit_to_ms(dur["unit"], dur["time"]),
                     init_durations,
+                )
+            ),
+            "maxMemoryUsagesList": list(
+                map(
+                    lambda memory: convert_memory_value_to_MB(
+                        memory["unit"], memory["value"]
+                    ),
+                    max_memory_usages,
                 )
             ),
         }

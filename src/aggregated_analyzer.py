@@ -1,12 +1,16 @@
-from src.helpers import convert_result_to_appropiate_unit
+from src.helpers import (
+    convert_memory_result_to_appropiate_unit,
+    convert_result_to_appropiate_unit,
+)
 
 
 class AggregatedAnalyzer:
-    def __init__(self, durations_lst, init_duration_lst) -> None:
+    def __init__(self, durations_lst, init_duration_lst, max_memory_usages_lst) -> None:
         self.durations_lst = durations_lst
         self.init_duration_lst = AggregatedAnalyzer._clean_init_duration_zeros(
             init_duration_lst
         )
+        self.max_memory_usages_lst = max_memory_usages_lst
 
     def get_results(self) -> object:
         max_duration = convert_result_to_appropiate_unit(
@@ -17,6 +21,11 @@ class AggregatedAnalyzer:
         )
         max_init_duration = convert_result_to_appropiate_unit(
             max(self.init_duration_lst) if len(self.init_duration_lst) > 0 else 0
+        )
+        max_memory_usage = convert_memory_result_to_appropiate_unit(
+            max(self.max_memory_usages_lst)
+            if len(self.max_memory_usages_lst) > 0
+            else 0
         )
 
         return {
@@ -32,6 +41,10 @@ class AggregatedAnalyzer:
                 self.init_duration_lst
             ),
             "maxInitDuration": max_init_duration,
+            "avgMaxMemoryUsage": AggregatedAnalyzer._calculate_average_max_memory(
+                self.max_memory_usages_lst
+            ),
+            "maxMemoryUsage": max_memory_usage,
         }
 
     @classmethod
@@ -70,3 +83,14 @@ class AggregatedAnalyzer:
             if init_dur > 0:
                 init_dur_clean.append(init_dur)
         return init_dur_clean
+
+    @classmethod
+    def _calculate_average_max_memory(cls, memory_lst) -> str:
+        if len(memory_lst) <= 0:
+            return convert_memory_result_to_appropiate_unit(0)
+
+        total = 0
+        for memory in memory_lst:
+            total += memory
+
+        return convert_memory_result_to_appropiate_unit(int(total / len(memory_lst)))

@@ -73,3 +73,21 @@ def convert_result_to_appropiate_unit(result: float):
 def get_time_and_unit_duration(duration_str: str):
     split = duration_str.split(" ")
     return float(split[0]), split[1]
+
+
+def get_memory_value_and_unit(memory_str: str):
+    split = memory_str.split(" ")
+    return int(split[0]), split[1]
+
+
+def convert_memory_value_to_MB(unit, value):
+    if unit == "GB":
+        return int(value * 1024)
+    return value
+
+
+def convert_memory_result_to_appropiate_unit(result: int):
+    # MB to GB
+    if result >= 1024:
+        return f"{round(result / 1024, 2)} GB"
+    return f"{result} MB"
