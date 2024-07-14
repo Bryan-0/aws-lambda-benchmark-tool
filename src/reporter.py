@@ -1,7 +1,8 @@
 from pathlib import Path
-import matplotlib.pyplot as plt
 import json
 import os
+
+from src.graphics import Graphics
 
 
 class ResultReporter:
@@ -21,16 +22,31 @@ class ResultReporter:
             f.write(json.dumps(json_report_content, indent=4))
 
     @staticmethod
-    def export_graph_image(duration_results_arr: list, lambda_name: str):
-        duration_graph_location = (
-            f"{Path.cwd()}/output/graphs/durations_graph_report.png"
-        )
-        os.makedirs(os.path.dirname(duration_graph_location), exist_ok=True)
+    def export_graph_image(
+        duration_results_arr: list, max_memory_usages_arr: list, lambda_name: str
+    ):
+        cwd = Path.cwd()
+        duration_graph_filename = f"{cwd}/output/graphs/durations_graph_report.png"
+        memory_graph_filename = f"{cwd}/output/graphs/memory_usages_graph_report.png"
+        os.makedirs(os.path.dirname(duration_graph_filename), exist_ok=True)
 
         x_axis = [i + 1 for i in range(len(duration_results_arr))]
-        plt.plot(x_axis, duration_results_arr)
-        plt.ylabel("Duration ms")
-        plt.xlabel("No. Executions")
-        plt.xticks(ticks=plt.xticks()[0], labels=plt.xticks()[0].astype(int))
-        plt.title(f"Execution Duration for Lambda {lambda_name}")
-        plt.savefig(duration_graph_location)
+
+        # Duration Graph
+        Graphics.draw_line_graph(
+            title=f"Execution Duration for Lambda {lambda_name}",
+            x_axis=x_axis,
+            x_label="No. Executions",
+            y_axis=duration_results_arr,
+            y_label="Duration ms",
+            filename=duration_graph_filename,
+        )
+        # Memory Graph
+        Graphics.draw_line_graph(
+            title=f"Max Memory Usages for Lambda {lambda_name}",
+            x_axis=x_axis,
+            x_label="No. Executions",
+            y_axis=max_memory_usages_arr,
+            y_label="Memory MB",
+            filename=memory_graph_filename,
+        )

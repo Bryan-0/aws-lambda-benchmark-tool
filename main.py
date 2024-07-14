@@ -136,4 +136,6 @@ if __name__ == "__main__":
         )
 
     if args.export_graph:
-        ResultReporter.export_graph_image(duration_results_arr, args.function)
+        ResultReporter.export_graph_image(
+            duration_results_arr, max_memory_usages_arr, args.function
+        )

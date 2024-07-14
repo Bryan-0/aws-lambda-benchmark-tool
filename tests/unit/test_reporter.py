@@ -1,5 +1,5 @@
 import json
-from unittest.mock import patch, mock_open, ANY
+from unittest.mock import patch, mock_open, ANY, call
 from src.reporter import ResultReporter
 
 
@@ -32,25 +32,48 @@ def test_ResultReporter_export_json_file(cwd_mock, os_makedirs_mock):
 
 @patch("os.makedirs")
 @patch("pathlib.Path.cwd")
-@patch("src.reporter.plt")
+@patch("src.graphics.plt")
 def test_ResultReporter_export_graph_image(plt_mock, cwd_mock, os_makedirs_mock):
     cwd_mock.return_value = "/my_location"
     duration_results_arr = [1.5, 3.2, 2.3, 1.9, 4.5]
+    memory_usages_arr = [35, 35, 35, 36, 36]
     lambda_name = "pollo"
 
-    ResultReporter.export_graph_image(duration_results_arr, lambda_name)
+    ResultReporter.export_graph_image(
+        duration_results_arr, memory_usages_arr, lambda_name
+    )
 
     os_makedirs_mock.assert_called_once_with(
         "/my_location/output/graphs", exist_ok=True
     )
 
-    plt_mock.plot.assert_called_once_with([1, 2, 3, 4, 5], duration_results_arr)
-    plt_mock.ylabel.assert_called_once_with("Duration ms")
-    plt_mock.xlabel.assert_called_once_with("No. Executions")
-    plt_mock.xticks.assert_called_with(ticks=ANY, labels=ANY)
-    plt_mock.title.assert_called_once_with(
-        f"Execution Duration for Lambda {lambda_name}"
+    plt_mock.plot.assert_has_calls(
+        [
+            call([1, 2, 3, 4, 5], duration_results_arr),
+            call([1, 2, 3, 4, 5], memory_usages_arr),
+        ]
     )
-    plt_mock.savefig.assert_called_once_with(
-        "/my_location/output/graphs/durations_graph_report.png"
+    plt_mock.ylabel.assert_has_calls(
+        [
+            call("Duration ms"),
+            call("Memory MB"),
+        ]
+    )
+    plt_mock.xlabel.assert_has_calls(
+        [
+            call("No. Executions"),
+            call("No. Executions"),
+        ]
+    )
+    plt_mock.title.assert_has_calls(
+        [
+            call(f"Execution Duration for Lambda {lambda_name}"),
+            call(f"Max Memory Usages for Lambda {lambda_name}"),
+        ]
+    )
+    plt_mock.savefig.assert_has_calls(
+        [
+            call("/my_location/output/graphs/durations_graph_report.png"),
+            call("/my_location/output/graphs/memory_usages_graph_report.png"),
+        ]
     )
