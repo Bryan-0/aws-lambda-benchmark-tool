@@ -7,3 +7,4 @@ venv/
 
 graph_report.png
 report.json
+output/
