@@ -45,9 +45,17 @@ def add_arguments_to_parser(parser: ArgumentParser):
 
     parser.add_argument(
         "--payload",
-        help='Payload sent to the Lambd function, e.g.: \'{"foo": "bar"}\'',
+        help='Static Payload sent to the Lambda function, e.g.: \'{"foo": "bar"}\'',
         default="{}",
         type=str,
+    )
+
+    parser.add_argument(
+        "--dynamic-payload",
+        help="Use of the make_dynamic_payload function to generate a payload on each lambda execution",
+        default=False,
+        type=bool,
+        action=BooleanOptionalAction,
     )
 
     parser.add_argument(

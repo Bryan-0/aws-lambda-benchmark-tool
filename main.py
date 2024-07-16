@@ -26,7 +26,7 @@ def main(
     individual_results_dict,
 ):
     lambda_client = LambdaClient(args)
-    lambda_analyzer = LambdaAnalyzer(lambda_client, args)
+    lambda_analyzer = LambdaAnalyzer(lambda_client, args, worker + 1)
     results = lambda_analyzer.get_results()
     duration_result_lst = results["durationList"]
     init_result_lst = results["initDurationList"]
@@ -69,7 +69,7 @@ def main(
         )
     )
 
-    individual_results_dict[f"worker{worker}Results"] = results
+    individual_results_dict[f"worker{worker + 1}Results"] = results
     return results
 
 

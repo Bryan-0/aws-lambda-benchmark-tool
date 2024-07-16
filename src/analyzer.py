@@ -1,4 +1,6 @@
 from base64 import b64decode
+import json
+
 from src.lambda_client import LambdaClient
 from src.helpers import (
     calculate_average_duration,
@@ -9,24 +11,26 @@ from src.helpers import (
     get_memory_value_and_unit,
     get_time_and_unit_duration,
 )
+from src.payload.dynamic_payload import make_dynamic_payload
 
 
 class LambdaAnalyzer:
-    def __init__(self, lambda_client: LambdaClient, args) -> None:
+    def __init__(self, lambda_client: LambdaClient, args, worker_num) -> None:
         self.lambda_client = lambda_client
         self.function = args.function
         self.payload = args.payload
         self.num_invocations = args.num_invocations
+        self.is_dynamic_payload_enabled = args.dynamic_payload
+        self.worker_num = worker_num
 
     def get_results(self) -> object:
         self._print_lambda_params()
 
         log_results_lst = []
-        for _ in range(self.num_invocations):
-            # TODO: dynamic payload option - user-provided function
+        for execution_num in range(self.num_invocations):
             response = self.lambda_client.invoke_lambda(
                 self.function,
-                self.payload,
+                self._build_lambda_payload(execution_num + 1),
             )
             log_results_lst.append(
                 b64decode(response.get("LogResult", "")).decode("utf-8")
@@ -102,3 +106,17 @@ class LambdaAnalyzer:
         print(
             f"Calling Lambda function: `{self.function}` with payload `{self.payload}` for `{self.num_invocations}` times."
         )
+
+    def _build_lambda_payload(self, executionNum):
+        if self.is_dynamic_payload_enabled:
+            return json.dumps(
+                make_dynamic_payload(
+                    {
+                        "executionNum": executionNum,
+                        "lambdaName": self.function,
+                        "workerNum": self.worker_num,
+                    }
+                )
+            )
+
+        return self.payload
