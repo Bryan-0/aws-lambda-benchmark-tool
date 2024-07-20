@@ -1,6 +1,7 @@
 from base64 import b64decode
 import json
 
+from src.costs import LambdaCostsCalculator
 from src.lambda_client import LambdaClient
 from src.helpers import (
     calculate_average_duration,
@@ -18,6 +19,7 @@ class LambdaAnalyzer:
     def __init__(self, lambda_client: LambdaClient, args, worker_num) -> None:
         self.lambda_client = lambda_client
         self.function = args.function
+        self.function_conf = self._get_function_config()
         self.payload = args.payload
         self.num_invocations = args.num_invocations
         self.is_dynamic_payload_enabled = args.dynamic_payload
@@ -39,10 +41,10 @@ class LambdaAnalyzer:
         return self._generate_report_from_log_results(log_results_lst)
 
     def _generate_report_from_log_results(self, log_results_lst: list[str]):
-        # TODO: estimate costs - evalute memory conf + billed duration + ephemeral storage conf (use GetFunctionConfiguration API)
         durations = []
         init_durations = []
         max_memory_usages = []
+        costs_per_execution = []
 
         for log_result in log_results_lst:
             for line in log_result.split("\n"):
@@ -53,6 +55,18 @@ class LambdaAnalyzer:
                             time, unit = get_time_and_unit_duration(
                                 item.split("Billed Duration: ")[-1]
                             )
+
+                            billed_time_ms = convert_duration_unit_to_ms(unit, time)
+                            execution_cost = (
+                                LambdaCostsCalculator.calculate_execution_cost(
+                                    billed_time_ms,
+                                    self.function_conf["memorySize"],
+                                    self.function_conf["ephemeralStorageSize"],
+                                    self.function_conf["architecture"],
+                                )
+                            )
+                            costs_per_execution.append(execution_cost)
+
                         elif "Init Duration:" in item:
                             time, unit = get_time_and_unit_duration(
                                 item.split("Init Duration: ")[-1]
@@ -80,6 +94,7 @@ class LambdaAnalyzer:
             "maxDuration": max_duration,
             "minDuration": min_duration,
             "maxInitDuration": max_init,
+            "totalExecutionCosts": sum(costs_per_execution),
             "durationList": list(
                 map(
                     lambda dur: convert_duration_unit_to_ms(dur["unit"], dur["time"]),
@@ -120,3 +135,16 @@ class LambdaAnalyzer:
             )
 
         return self.payload
+
+    def _get_function_config(self):
+        config = {}
+        response = self.lambda_client.get_function_configuration(self.function)
+
+        config["name"] = response["FunctionName"]
+        config["memorySize"] = response["MemorySize"]
+        config["ephemeralStorageSize"] = response["EphemeralStorage"]["Size"]
+        config["architecture"] = (
+            "arm" if "arm64" in response["Architectures"] else "x86"
+        )
+
+        return config

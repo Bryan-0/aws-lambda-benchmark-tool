@@ -127,7 +127,10 @@ if __name__ == "__main__":
         process.join()
 
     aggregated_analyzer = AggregatedAnalyzer(
-        duration_results_arr, init_results_arr, max_memory_usages_arr
+        duration_results_arr,
+        init_results_arr,
+        max_memory_usages_arr,
+        individual_results_dict,
     )
     aggregated_results = aggregated_analyzer.get_results()
     print(f"Aggregated Results: {json.dumps(aggregated_results, indent=4)}")

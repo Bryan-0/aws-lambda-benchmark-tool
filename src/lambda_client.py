@@ -12,9 +12,16 @@ class LambdaClient:
         )
         self.client = session.client("lambda")
 
-    def invoke_lambda(self, function, payload) -> None:
+    def invoke_lambda(self, function, payload) -> dict:
+        # TODO: handle throttles retry patterns
         return self.client.invoke(
             FunctionName=function,
             LogType="Tail",
             Payload=bytes(payload, encoding="utf-8"),
+        )
+
+    def get_function_configuration(self, function) -> dict:
+        # TODO: handle throttles retry patterns
+        return self.client.get_function_configuration(
+            FunctionName=function,
         )

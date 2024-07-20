@@ -40,6 +40,15 @@ def test_LambdaAnalyzer_get_results_returns_report_dict_correctly_with_static_pa
         "Payload": boto3_streaming_body_response,
     }
 
+    lambda_client.get_function_configuration.return_value = {
+        "FunctionName": "EldenRing",
+        "MemorySize": 1024,
+        "EphemeralStorage": {
+            "Size": 512
+        },
+        "Architectures": ["x86"]
+    }
+
     lambda_analyzer = LambdaAnalyzer(lambda_client, args, worker_num)
     report_results = lambda_analyzer.get_results()
 
@@ -55,6 +64,7 @@ def test_LambdaAnalyzer_get_results_returns_report_dict_correctly_with_static_pa
         "durationList": [2.3],
         "initDurationList": [92.18],
         "maxMemoryUsagesList": [35],
+        "totalExecutionCosts": 5.00001e-08,
     }
 
 
@@ -97,6 +107,15 @@ def test_LambdaAnalyzer_get_results_returns_report_dict_correctly_with_dynamic_p
         "Payload": boto3_streaming_body_response,
     }
 
+    lambda_client.get_function_configuration.return_value = {
+        "FunctionName": "EldenRing",
+        "MemorySize": 1024,
+        "EphemeralStorage": {
+            "Size": 512
+        },
+        "Architectures": ["x86"]
+    }
+
     lambda_analyzer = LambdaAnalyzer(lambda_client, args, worker_num)
     report_results = lambda_analyzer.get_results()
 
@@ -112,5 +131,6 @@ def test_LambdaAnalyzer_get_results_returns_report_dict_correctly_with_dynamic_p
         "durationList": [2.3],
         "initDurationList": [92.18],
         "maxMemoryUsagesList": [35],
+        "totalExecutionCosts": 5.00001e-08,
     }
 

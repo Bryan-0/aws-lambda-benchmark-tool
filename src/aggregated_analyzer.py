@@ -5,12 +5,19 @@ from src.helpers import (
 
 
 class AggregatedAnalyzer:
-    def __init__(self, durations_lst, init_duration_lst, max_memory_usages_lst) -> None:
+    def __init__(
+        self,
+        durations_lst,
+        init_duration_lst,
+        max_memory_usages_lst,
+        individual_results_dict,
+    ) -> None:
         self.durations_lst = durations_lst
         self.init_duration_lst = AggregatedAnalyzer._clean_init_duration_zeros(
             init_duration_lst
         )
         self.max_memory_usages_lst = max_memory_usages_lst
+        self.individual_results_dict = individual_results_dict
 
     def get_results(self) -> object:
         max_duration = convert_result_to_appropiate_unit(
@@ -45,6 +52,9 @@ class AggregatedAnalyzer:
                 self.max_memory_usages_lst
             ),
             "maxMemoryUsage": max_memory_usage,
+            "totalExecutionCosts": AggregatedAnalyzer._sum_total_execution_costs(
+                self.individual_results_dict
+            ),
         }
 
     @classmethod
@@ -94,3 +104,14 @@ class AggregatedAnalyzer:
             total += memory
 
         return convert_memory_result_to_appropiate_unit(int(total / len(memory_lst)))
+
+    @classmethod
+    def _sum_total_execution_costs(cls, individual_results_dict: dict):
+        total = 0
+
+        for worker_result_dict in individual_results_dict.values():
+            for result_key, result_value in worker_result_dict.items():
+                if result_key == "totalExecutionCosts":
+                    total += result_value
+
+        return total

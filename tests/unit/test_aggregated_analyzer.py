@@ -5,9 +5,16 @@ def test_AggregatedAnalyzer_get_results_returns_aggregated_report_correctly():
     durations_lst = [3.60, 1.45, 7.40, 4.25, 2.22]
     init_durations_lst = [0, 0, 30.6, 0, 56.9]
     max_memory_usages_lst = [35, 35, 35, 36, 36]
+    individual_results_dict = {
+        "worker1Results": {"totalExecutionCosts": 1},
+        "worker2Results": {"totalExecutionCosts": 1},
+    }
 
     aggregated_analyzer = AggregatedAnalyzer(
-        durations_lst, init_durations_lst, max_memory_usages_lst
+        durations_lst,
+        init_durations_lst,
+        max_memory_usages_lst,
+        individual_results_dict,
     )
     report_results = aggregated_analyzer.get_results()
 
@@ -25,6 +32,7 @@ def test_AggregatedAnalyzer_get_results_returns_aggregated_report_correctly():
         "maxInitDuration": "56.9 ms",
         "avgMaxMemoryUsage": "35 MB",
         "maxMemoryUsage": "36 MB",
+        "totalExecutionCosts": 2,
     }
 
 
@@ -32,9 +40,13 @@ def test_AggregatedAnalyzer_get_results_returns_zeros_when_no_list_values_provid
     durations_lst = []
     init_durations_lst = []
     max_memory_usages_lst = []
+    individual_results_dict = {}
 
     aggregated_analyzer = AggregatedAnalyzer(
-        durations_lst, init_durations_lst, max_memory_usages_lst
+        durations_lst,
+        init_durations_lst,
+        max_memory_usages_lst,
+        individual_results_dict,
     )
     report_results = aggregated_analyzer.get_results()
 
@@ -47,4 +59,5 @@ def test_AggregatedAnalyzer_get_results_returns_zeros_when_no_list_values_provid
         "maxInitDuration": "0 ms",
         "avgMaxMemoryUsage": "0 MB",
         "maxMemoryUsage": "0 MB",
+        "totalExecutionCosts": 0,
     }

@@ -43,3 +43,22 @@ def test_lambda_client_invoke_lambda_with_expected_payload(boto3_session):
         LogType="Tail",
         Payload=bytes(payload, encoding="utf-8"),
     )
+
+
+@patch("boto3.Session")
+def test_lambda_client_get_function_configuration_with_expected_parameter(
+    boto3_session,
+):
+    args = Mock()
+    args.aws_access_key_id = None
+    args.aws_secret_access_key = None
+    args.aws_session_token = None
+    args.profile = "brayan"
+    args.region = "us-east-1"
+
+    lambda_client = LambdaClient(args)
+    lambda_client.get_function_configuration("MyFunction")
+
+    boto3_session.return_value.client.return_value.get_function_configuration.assert_called_once_with(
+        FunctionName="MyFunction",
+    )
