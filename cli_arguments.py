@@ -83,7 +83,7 @@ def add_arguments_to_parser(parser: ArgumentParser):
 
     parser.add_argument(
         "--export-report-json",
-        help="If enabled, it will export a json file to the current directory",
+        help="If enabled, it will export a json file report about the aggregated latency, memory and costs.",
         type=bool,
         default=False,
         action=BooleanOptionalAction,
@@ -91,7 +91,7 @@ def add_arguments_to_parser(parser: ArgumentParser):
 
     parser.add_argument(
         "--export-graph",
-        help="If enabled, it will export a line graph about the aggregated latency",
+        help="If enabled, it will export graphs about the aggregated latency and memory utilized.",
         type=bool,
         default=False,
         action=BooleanOptionalAction,
