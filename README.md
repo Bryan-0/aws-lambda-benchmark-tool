@@ -4,13 +4,7 @@
 
 This tool allows you to benchmark your AWS Lambda functions by invoking them multiple times in parallel and generating detailed latency reports. The tool provides overall average latency, maximum and minimum latency, and percentile latencies (p80, p90, p95, p99). The results are available in JSON format and as PNG graphs for easy analysis and reporting.
 
-Additionally, it gives you an average of the memory utilized by your Lambda along with the memory utilized on each execution (available in the output reports).
-
-Here are some examples of the reports you can expect to see when benchmarking your Lambda:
-
-[Insert Image]
-
-[Insert Image]
+It also gives you an average of the memory utilized by your Lambda, and a cost estimation based on your function configuration for each execution done.
 
 
 ## CLI Arguments
@@ -89,11 +83,67 @@ python main.py --function <FunctionName> --profile brayan --payload '{"foo": "ba
 
 ## Report Examples
 
-...
+Graphs for Duration and Memory utilization:
+
+![image](https://github.com/user-attachments/assets/2305b66a-0157-4ab4-a884-59accf9de5e1)
+![image](https://github.com/user-attachments/assets/66dc1df1-940b-461c-bf78-9dc9adff841c)
+
+JSON Report Format:
+```json
+{
+    "report": {
+        "lambda": "Testing",
+        "aggregated": {
+            "avgDuration": "2.45 ms",
+            "percentilesDuration": {
+                "p80": "1.8 ms",
+                "p90": "4.98 ms",
+                "p95": "10.5 ms",
+                "p99": "14.67 ms"
+            },
+            "maxDuration": "19.61 ms",
+            "minDuration": "0.9 ms",
+            "avgInitDuration": "92.72 ms",
+            "maxInitDuration": "99.76 ms",
+            "avgMaxMemoryUsage": "36 MB",
+            "maxMemoryUsage": "37 MB",
+            "totalExecutionCosts": 6.1833457e-06
+        },
+        "individual": {
+            "worker1Results": {
+                "avgDuration": "2.89 ms",
+                "p95Duration": "12.22 ms",
+                "maxDuration": "14.6 ms",
+                "minDuration": "0.98 ms",
+                "maxInitDuration": "90.26 ms",
+                "totalExecutionCosts": 7.145847625000001e-07,
+                "durationList": [
+                    "11.49 ms",
+                    ...
+                ],
+                "initDurationList": [
+                    "90.26 ms"
+                ],
+                "maxMemoryUsagesList": [
+                    "37 MB",
+                    ...
+                ]
+            },
+            ...
+        }
+    }
+}
+```
+
+## How does this tool internally work?
+
+If you are curious about the code itself, the core logic is happening in the `src/analyzer.py` file, the class `LambdaAnalyzer` is in charge of calling the Lambda using the [Invoke API](https://docs.aws.amazon.com/lambda/latest/api/API_Invoke.html) through boto3, and then ingesting the LogResults given.
+
+On those logs, we only care for the `REPORT` log line, which contains the duration latency, billed duration and max memory used information used for the later aggregated analysis.
 
 ## Issues
 
-If you encounter any issue or bug while running this tool, please open a issue on the repository and I will take a look as soon as I can.
+If you encounter any issue or bug while running this tool, please open an issue on the repository and I will take a look as soon as I can.
 
 ## License
 
